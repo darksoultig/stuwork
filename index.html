@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <title>Stuwork AI | ระบบตรวจการบ้านคณิตศาสตร์</title>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form>
+                <h1>Create Account</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+                <span>or use your email for registeration</span>
+                <input type="text" placeholder="Name">
+                <input type="email" placeholder="Email">
+                <input type="password" placeholder="Password">
+                <button type="button" onclick="handleLogin()">Sign Up</button>
+            </form>
+        </div>                                    
+        <div class="form-container sign-in">
+            <form>
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+                <span>or use your email password</span>
+                <input type="email" placeholder="Email">
+                <input type="password" placeholder="Password">
+                <a href="#">Forget Your Password?</a>
+                <button type="button" onclick="handleLogin()">Sign In</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your personal details to use all of site features</p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Register with your personal details to use all of site features</p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ai-dashboard" style="display: none;">
+        <div style="display: flex; height: 100%;">
+            <div class="sidebar">
+                <h2>⚡ STUWORK AI</h2>
+                <hr style="opacity: 0.3">
+                <label>🔑 API Key</label>
+                <input type="password" id="apiKey" style="width: 100%; padding: 8px; border-radius: 5px; border:none;" placeholder="Gemini API Key" value="AIzaSyBOkvc--X7GnbopCZy3r3kIdMVfIOdoJUc">
+                <button onclick="location.reload()" style="background: rgba(255,255,255,0.2); color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; margin-top: auto;">Logout</button>
+            </div>
+            <div class="main-app">
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
+                    <div class="main-card">
+                        <h3>📤 Upload Work</h3>
+                        <select id="subjectSelect" style="width:100%; padding:10px; margin: 15px 0; border-radius:8px;">
+                            <option value="Math">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="English">English</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Biology">Biology</option>
+                            <option value="History">History</option>
+                            <option value="Geography">Geography</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="file" id="fileInput" accept="image/*">
+                        <img id="imagePreview" alt="Preview" style="max-width: 100%; margin-top: 15px; display: none; border-radius: 10px; border: 2px solid #512da8;">
+                    </div>
+                    <div class="main-card">
+                        <h3>📊 Analysis Result</h3>
+                        <button id="analyzeBtn" class="neon-btn" style="margin: 15px 0;">Start AI Analysis</button>
+                        <div id="scoreBox" class="score-box" style="display:none; text-align: center;">
+                            <div class="score-value" id="scoreValue">0</div>
+                            <p>Total Score</p>
+                        </div>
+                        <div id="resultOutput" style="font-size: 16px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        // --- UI Logic (Login Toggle) ---
+        const container = document.getElementById('container');
+        const registerBtn = document.getElementById('register');
+        const loginBtn = document.getElementById('login');
+
+        registerBtn.addEventListener('click', () => container.classList.add("active"));
+        loginBtn.addEventListener('click', () => container.classList.remove("active"));
+
+        window.handleLogin = () => {
+            container.style.display = 'none';
+            document.getElementById('ai-dashboard').style.display = 'block';
+            document.body.style.justifyContent = 'center';
+        };
+
+        // --- AI & Math Logic ---
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+
+        fileInput.onchange = evt => {
+            const [file] = fileInput.files;
+            if (file) {
+                imagePreview.src = URL.createObjectURL(file);
+                imagePreview.style.display = 'block';
+            }
+        }
+
+        async function fileToGenerativePart(file) {
+            const base64EncodedDataPromise = new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+            return { inlineData: { data: await base64EncodedDataPromise, mimeType: file.type } };
+        }
+
+        analyzeBtn.onclick = async () => {
+            const key = document.getElementById('apiKey').value;
+            const file = fileInput.files[0];
+            const subject = document.getElementById('subjectSelect').value;
+
+            if(!key || !file) return alert("Please check API Key and Upload Image");
+
+            analyzeBtn.innerText = "Analyzing Math Logic...";
+            analyzeBtn.disabled = true;
+
+            try {
+                const genAI = new GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+                // ปรับ Prompt ให้ AI ตอบในรูปแบบ LaTeX เพื่อให้ MathJax เรนเดอร์ออกมาเหมือนในภาพ
+                const prompt = `คุณคืออาจารย์ที่ตรวจวิชา ${subject} อย่างละเอียดมากๆ โดยให้คะแนนตามความถูกต้องของคำตอบในภาพที่แนบมา
+                หากเป็นเรื่องเมทริกซ์หรือดีเทอร์มิแนนต์ ให้ใช้สัญลักษณ์ LaTeX เช่น \\det\\begin{vmatrix}...\\end{vmatrix} 
+                
+                คุณต้องตอบตามหัวข้อต่อไปนี้:
+                
+                **เงื่อนไขการตอบกลับ:**
+                1. หากเป็นวิชาคณิตศาสตร์ (เช่น Matrix/Determinant) ให้แสดง 'วิธีทำ' โดยใช้สัญลักษณ์ทางคณิตศาสตร์แบบ LaTeX อย่างละเอียด (เช่น \\det \\begin{vmatrix} ... \\end{vmatrix})
+                2. ให้คะแนนเต็ม 100 หากไม่มีวิธีทำ (มีแค่คำตอบ) ให้หักคะแนนเหลือไม่เกิน 25
+                3. ตอบกลับตามหัวข้อดังนี้:
+                   - **คะแนนที่ได้:** (เช่น 85/100)
+                   - **จุดที่ทำได้ดี:**
+                   - **ข้อผิดพลาดที่ควรแก้ไข:**
+                   - **เฉลย:** (ใช้รูปแบบคณิตศาสตร์ที่สวยงาม)
+                   - **วิธีทำ:** (แสดงขั้นตอนแบบ Step-by-step พร้อมคำอธิบาย)
+                
+                สำคัญ: ให้ใช้เครื่องหมาย $...$ ครอบสัญลักษณ์คณิตศาสตร์เพื่อให้ระบบเรนเดอร์ได้;
+                
+                เน้นย้ำ: หากไม่มีวิธีทำในภาพ ให้หักคะแนนตามความเหมาะสม`;
+
+                const imagePart = await fileToGenerativePart(file);
+                const result = await model.generateContent([prompt, imagePart]);
+                const response = await result.response;
+                const text = response.text();
+
+                // แสดงคะแนน
+                const scoreMatch = text.match(/(\d+)\/100/);
+                if(scoreMatch) {
+                    document.getElementById('scoreValue').innerText = scoreMatch[1];
+                    document.getElementById('scoreBox').style.display = 'block';
+                }
+
+                // แสดงเนื้อหาและสั่งให้ MathJax ประมวลผลสัญลักษณ์คณิตศาสตร์
+                const outputDiv = document.getElementById('resultOutput');
+                outputDiv.innerHTML = marked.parse(text);
+                
+                // กระตุ้นให้ MathJax ทำงานกับเนื้อหาที่เพิ่มเข้ามาใหม่
+                if (window.MathJax) {
+                    MathJax.typesetPromise([outputDiv]);
+                }
+
+            } catch (err) {
+                alert("Error: " + err.message);
+            } finally {
+                analyzeBtn.innerText = "Start AI Analysis";
+                analyzeBtn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>
