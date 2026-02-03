@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stuwork-Easy to Check</title>
+    <link rel="stylesheet" href="tooplate-strategic-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- Login Styles --- */
+        #login-screen {
+            background-color: #f6f5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+        }
+
+        .container-login {
+            background-color: #fff;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+            width: 768px;
+            max-width: 95%;
+            min-height: 520px;
+        }
+
+        .container-login form {
+            background-color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            height: 100%;
+        }
+
+        .container-login input {
+            background-color: #eee;
+            border: 2px solid transparent;
+            margin: 8px 0;
+            padding: 10px 15px;
+            font-size: 13px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .role-selection {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 8px !important;
+            background-color: #eee !important;
+            color: #333 !important;
+            border: 2px solid transparent !important;
+            font-size: 11px !important;
+            margin-top: 0 !important;
+            cursor: pointer;
+        }
+
+        .role-btn.active {
+            border-color: #4ade80 !important;
+            background-color: #e8fdf0 !important;
+            color: #2ecc71 !important;
+        }
+
+        .input-error {
+            border-color: #ff4d4d !important;
+            background-color: #fff1f1 !important;
+        }
+
+        .error-text {
+            color: #ff4d4d;
+            font-size: 12px;
+            margin-bottom: 5px;
+            display: none;
+            font-weight: bold;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake-animation {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .container-login button {
+            background-color: #4ade80;
+            color: #fff;
+            font-size: 12px;
+            padding: 10px 45px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .container-login button:hover {
+            background-color: #3bce70;
+        }
+
+        .container-login button.hidden {
+            background-color: transparent;
+            border-color: #fff;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .container-login.active .sign-in {
+            transform: translateX(100%);
+        }
+
+        .sign-up {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .container-login.active .sign-up {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: move 0.6s;
+        }
+
+        @keyframes move {
+
+            0%,
+            49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+
+            50%,
+            100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        .social-icons {
+            margin: 20px 0;
+        }
+
+        .social-icons a {
+            border: 1px solid #ccc;
+            border-radius: 20%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 3px;
+            width: 40px;
+            height: 40px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toggle-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: all 0.6s ease-in-out;
+            border-radius: 150px 0 0 100px;
+            z-index: 1000;
+        }
+
+        .container-login.active .toggle-container {
+            transform: translateX(-100%);
+            border-radius: 0 150px 100px 0;
+        }
+
+        .toggle {
+            background-color: #4ade80;
+            background: linear-gradient(to right, #2ecc71, #4ade80);
+            color: #fff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: all 0.6s ease-in-out;
+        }
+
+        .container-login.active .toggle {
+            transform: translateX(50%);
+        }
+
+        .toggle-panel {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 30px;
+            text-align: center;
+            top: 0;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .toggle-left {
+            transform: translateX(-200%);
+        }
+
+        .container-login.active .toggle-left {
+            transform: translateX(0);
+        }
+
+        .toggle-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .container-login.active .toggle-right {
+            transform: translateX(200%);
+        }
+
+        /* --- Welcome Page Styles --- */
+        #welcome-page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #4ade80 0%, #2ecc71 100%);
+            z-index: 9998;
+            color: white;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .welcome-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            color: #333;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-card h2 {
+            margin-bottom: 10px;
+            color: #2ecc71;
+        }
+
+        .btn-continue {
+            margin-top: 20px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --- Main Website Styles --- */
+        .main-website-content {
+            display: block;
+        }
+
+        .service-details {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .service-details.active {
+            display: block;
+        }
+
+        .service-tab {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: 0.3s;
+        }
+
+        .service-tab.active {
+            opacity: 1;
+            transform: scale(1.05);
+            border: 2px solid #4ade80;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-neon {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #4ade80;
+            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .ai-text {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4ade80;
+        }
+
+        .ai-loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-screen">
+        <div class="container-login" id="container-login">
+            <div class="form-container sign-up">
+                <form id="signupForm">
+                    <h1>Create Account</h1>
+                    <span>Select your role:</span>
+                    <div class="role-selection">
+                        <button type="button" class="role-btn active"
+                            onclick="selectRole(this, 'student')">Student</button>
+                        <button type="button" class="role-btn" onclick="selectRole(this, 'teacher')">Teacher</button>
+                        <button type="button" class="role-btn" onclick="selectRole(this, 'admin')">Admin</button>
+                    </div>
+                    <input type="text" id="reg-name" placeholder="Username" required>
+                    <input type="email" id="reg-email" placeholder="Email" required>
+                    <input type="password" id="reg-password" placeholder="Password" required>
+                    <button type="submit" onclick="validateAndSubmit('signupForm')">Sign Up</button>
+                </form>
+            </div>
+
+            <div class="form-container sign-in">
+                <form id="signinForm">
+                    <h1>Sign In</h1>
+                    <span>Select your role:</span>
+                    <div class="role-selection">
+                        <button type="button" class="role-btn active"
+                            onclick="selectRole(this, 'student')">Student</button>
+                        <button type="button" class="role-btn" onclick="selectRole(this, 'teacher')">Teacher</button>
+                        <button type="button" class="role-btn" onclick="selectRole(this, 'admin')">Admin</button>
+                    </div>
+                    <div id="error-message" class="error-text">❌ อีเมล, รหัสผ่าน หรือสถานะไม่ถูกต้อง</div>
+                    <input type="email" id="login-email" placeholder="Email" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
+                    <a href="#">Forget Your Password?</a>
+                    <button type="submit">Sign In</button>
+                </form>
+            </div>
+
+            <div class="toggle-container">
+                <div class="toggle">
+                    <div class="toggle-panel toggle-left">
+                        <h1>Welcome Back!</h1>
+                        <p>Enter your personal details to use all of site features</p>
+                        <button class="hidden" id="loginBtn">Sign In</button>
+                    </div>
+                    <div class="toggle-panel toggle-right">
+                        <h1>Hello, Friend!</h1>
+                        <p>Register with your personal details to use all of site features</p>
+                        <button class="hidden" id="registerBtn">Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="welcome-page">
+        <div class="welcome-card">
+            <i class="fa-solid fa-circle-check" style="font-size: 50px; color: #2ecc71;"></i>
+            <h2 id="welcome-title">ยินดีต้อนรับ!</h2>
+            <p id="welcome-user-info"></p>
+            <p id="welcome-desc"></p>
+            <button class="btn-continue" onclick="startApp()">เข้าสู่หน้าหลัก</button>
+        </div>
+    </div>
+
+    <div id="teacherUI" style="display:none;">
+        <div class="main-website-content">
+            <nav class="navbar">
+                <div class="nav-container">
+                    <a href="#home" class="logo">
+                        <img src="images/PBL_LOGO-removebg-preview.png" alt="Stuwork Logo" class="logo-img">
+                    </a>
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Check</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#team">Team</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    <div class="mobile-menu"><span></span><span></span><span></span></div>
+                </div>
+            </nav>
+
+            <section id="home" class="hero">
+                <div class="geometric-shapes">
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                </div>
+                <div class="hero-content">
+                    <h1 id="hero-headline">Stuwork<br>let your success be your noise</h1>
+                    <p id="hero-paragraph">We are Stuwork, the easy-to-check solution for your homework needs.</p>
+                    <a href="#services-teacher" class="cta-button">Begin Your work</a>
+                </div>
+            </section>
+
+            <section id="services-teacher" class="services">
+                <div class="section services-container">
+                    <h2 class="section-title fade-in">Stuwork AI Grading System</h2>
+                    <div class="services-layout">
+                        <div class="services-content">
+                            <div class="service-details active" data-service="strategy">
+                                <h3>📐 Mathematics Analysis</h3>
+                                <div class="service-subtitle">Comprehensive Math</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Math"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาคณิตศาสตร์</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Stuwork helps bridge the gap between effort and achievement in Mathematics.</p>
+                            </div>
+
+                            <div class="service-details" data-service="digital">
+                                <h3>⚡ Physics</h3>
+                                <div class="service-subtitle">Advanced Force & Motion Assessment</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Physics"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาฟิสิกส์</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Transform your physics understanding through advanced AI ecosystems.</p>
+                            </div>
+
+                            <div class="service-details" data-service="performance">
+                                <h3>🧪 Chemistry</h3>
+                                <div class="service-subtitle">Chemical Equations & Periodic Logic</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Chemistry"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาเคมี</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Optimize chemical reaction analysis through data-driven methodologies.</p>
+                            </div>
+
+                            <div class="service-details" data-service="market">
+                                <h3>📝 English Linguistics</h3>
+                                <div class="service-subtitle">Grammar & Writing Intelligence</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="English"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาภาษาอังกฤษ</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Decode complex language behaviors and grammar structures.</p>
+                            </div>
+
+                            <div class="service-details" data-service="innovation">
+                                <h3>🔬 Biology & Life Science</h3>
+                                <div class="service-subtitle">Biological Systems & Taxonomy</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Biology"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาชีววิทยา</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Accelerate breakthrough understanding of biological processes.</p>
+                            </div>
+
+                            <div class="service-details" data-service="transformation">
+                                <h3>🌊 General Transformation</h3>
+                                <div class="service-subtitle">Multi-disciplinary Knowledge Assessment</div>
+                                <div class="ai-upload-zone">
+                                    <div class="full-score-container" style="margin-bottom: 15px;">
+                                        <label style="font-weight: bold; margin-right: 10px;">คะแนนเต็ม:</label>
+                                        <input type="number" class="full-score-input" value="100" min="1" max="1000"
+                                            style="width: 80px; padding: 8px; border: 2px solid #4ade80; border-radius: 8px; font-size: 14px;">
+                                    </div>
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="General"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาทั่วไป</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Navigate complex organizational change with precision-engineered AI.</p>
+                            </div>
+                        </div>
+
+                        <div class="services-tabs">
+                            <div class="service-tab active" data-target="strategy">
+                                <div class="tab-icon">📐</div>
+                                <h4>Mathematics</h4>
+                            </div>
+                            <div class="service-tab" data-target="digital">
+                                <div class="tab-icon">⚡</div>
+                                <h4>Physics</h4>
+                            </div>
+                            <div class="service-tab" data-target="performance">
+                                <div class="tab-icon">🧪</div>
+                                <h4>Chemistry</h4>
+                            </div>
+                            <div class="service-tab" data-target="market">
+                                <div class="tab-icon">📝</div>
+                                <h4>English</h4>
+                            </div>
+                            <div class="service-tab" data-target="innovation">
+                                <div class="tab-icon">🔬</div>
+                                <h4>Biology</h4>
+                            </div>
+                            <div class="service-tab" data-target="transformation">
+                                <div class="tab-icon">🌊</div>
+                                <h4>General</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about" class="about-section">
+                <div class="section about fade-in">
+                    <div class="about-content">
+                        <div class="highlight">Excellence Through Innovation</div>
+                        <h2>Let Stuwork be your 24/7 project proofreading assistant it will never get tired</h2>
+                        <p>We are pioneering consultants who have redefined strategic thinking...</p>
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">🎯</div>
+                                <div class="feature-text">To reduce the paperwork burden on teachers</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">📊</div>
+                                <div class="feature-text">To create a learning ecosystem that provides feedback</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-text">Create an active learning cycle</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">🚀</div>
+                                <div class="feature-text">Establish a data-driven, verifiable standard for measurement
+                                    of results</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-visual">
+                        <div class="about-image">
+                            <div class="visual-shapes">
+                                <div class="visual-shape"></div>
+                                <div class="visual-shape"></div>
+                                <div class="visual-shape"></div>
+                            </div>
+                            <img src="https://media.kare11.com/assets/KARE/images/68f10df4-cf09-43e4-a78a-11022bcef301/68f10df4-cf09-43e4-a78a-11022bcef301_1140x641.jpeg"
+                                alt="Strategic Excellence">
+                        </div>
+                        <div class="stats">
+                            <div class="stat"><span class="stat-number counter" data-count="79">0</span><span
+                                    class="stat-label">Reduce paper and ink</span></div>
+                            <div class="stat"><span class="stat-number counter" data-count="80">0</span><span
+                                    class="stat-label">Reduce working time</span></div>
+                            <div class="stat"><span class="stat-number counter" data-count="67">0</span><span
+                                    class="stat-label">Reduce paperwork</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="team" class="team">
+                <div class="section">
+                    <h2 class="section-title fade-in">Group member</h2>
+                    <div class="team-grid">
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-01.jpg" alt="Member 1" /></div>
+                                <div class="member-info">
+                                    <h3>Chatakarn Mekabut</h3>
+                                    <div class="member-role">NO.11</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-05.jpg" alt="Member 2" /></div>
+                                <div class="member-info">
+                                    <h3>Nakorn Phimsirikul</h3>
+                                    <div class="member-role">NO.12</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/20250813_145142_0.jpg" alt="Member 3" />
+                                </div>
+                                <div class="member-info">
+                                    <h3>Patcharakorn Bukkonprasert</h3>
+                                    <div class="member-role">NO.13</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-04.jpg" alt="Member 4" /></div>
+                                <div class="member-info">
+                                    <h3>Atichart Sahachartkosi</h3>
+                                    <div class="member-role">No.14</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-00.jpg" alt="Member 5" /></div>
+                                <div class="member-info">
+                                    <h3>Chansorn Kimyong</h3>
+                                    <div class="member-role">NO.19</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-06 (2).jpg" alt="Member 6" />
+                                </div>
+                                <div class="member-info">
+                                    <h3>Pornpipat Pongphun</h3>
+                                    <div class="member-role">NO.21</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="contact">
+                <div class="section">
+                    <h2 class="section-title fade-in">Initiate Your Transformation</h2>
+                    <div class="contact-content">
+                        <p>Ready to transcend conventional business boundaries?...</p>
+                        <form class="contact-form fade-in">
+                            <div class="form-group"><input type="text" placeholder="First Name" required><input
+                                    type="text" placeholder="Last Name" required></div>
+                            <div class="form-group"><input type="email" placeholder="Email Address" required><input
+                                    type="tel" placeholder="Phone Number"></div>
+                            <input type="text" placeholder="Organization Name"><textarea
+                                placeholder="Describe your strategic vision..." required></textarea>
+                            <button type="submit" class="submit-btn">Send advice</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-links"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms of
+                            Service</a><a href="#careers">Careers</a></div>
+                    <div class="footer-copyright">© 2025 Stuwork. All rights reserved.</div>
+                    <div class="footer-design">Design: <a href="https://www.tooplate.com" target="_blank">Tooplate</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <div id="studentUI" style="display:none;">
+        <div class="main-website-content">
+            <nav class="navbar">
+                <div class="nav-container">
+                    <a href="#home" class="logo">
+                        <img src="images/PBL_LOGO-removebg-preview.png" alt="Stuwork Logo" class="logo-img">
+                    </a>
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services-student">Check</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#team">Team</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    <div class="mobile-menu"><span></span><span></span><span></span></div>
+                </div>
+            </nav>
+
+            <section id="home" class="hero">
+                <div class="geometric-shapes">
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                    <div class="geo-shape"></div>
+                </div>
+                <div class="hero-content">
+                    <h1 id="hero-headline">Stuwork<br>let your success be your noise</h1>
+                    <p id="hero-paragraph">We are Stuwork, the easy-to-check solution for your homework needs.</p>
+                    <a href="#services-student" class="cta-button">Begin Your work</a>
+                </div>
+            </section>
+
+            <section id="services-student" class="services">
+                <div class="section services-container">
+                    <h2 class="section-title fade-in">Stuwork AI Grading System</h2>
+                    <div class="services-layout">
+                        <div class="services-content">
+                            <div class="service-details active" data-service="strategy">
+                                <h3>📐 Mathematics Analysis</h3>
+                                <div class="service-subtitle">Comprehensive Math & Matrix Grading</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Math"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาคณิตศาสตร์</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Stuwork helps bridge the gap between effort and achievement in Mathematics.</p>
+                            </div>
+
+                            <div class="service-details" data-service="digital">
+                                <h3>⚡ Physics</h3>
+                                <div class="service-subtitle">Advanced Force & Motion Assessment</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Physics"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาฟิสิกส์</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Transform your physics understanding through advanced AI ecosystems.</p>
+                            </div>
+
+                            <div class="service-details" data-service="performance">
+                                <h3>🧪 Chemistry</h3>
+                                <div class="service-subtitle">Chemical Equations & Periodic Logic</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Chemistry"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาเคมี</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Optimize chemical reaction analysis through data-driven methodologies.</p>
+                            </div>
+
+                            <div class="service-details" data-service="market">
+                                <h3>📝 English Linguistics</h3>
+                                <div class="service-subtitle">Grammar & Writing Intelligence</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="English"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาภาษาอังกฤษ</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Decode complex language behaviors and grammar structures.</p>
+                            </div>
+
+                            <div class="service-details" data-service="innovation">
+                                <h3>🔬 Biology & Life Science</h3>
+                                <div class="service-subtitle">Biological Systems & Taxonomy</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="Biology"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาชีววิทยา</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Accelerate breakthrough understanding of biological processes.</p>
+                            </div>
+
+                            <div class="service-details" data-service="transformation">
+                                <h3>🌊 General Transformation</h3>
+                                <div class="service-subtitle">Multi-disciplinary Knowledge Assessment</div>
+                                <div class="ai-upload-zone">
+                                    <input type="file" class="file-input" accept="image/*">
+                                    <button class="analyze-btn" data-subject="General"
+                                        style="width: 310px; height: 65px; border-radius: 20px; padding: 10px 20px; transition: 0.1s;"
+                                        onmousedown="this.style.transform ='scale(0.95)'"
+                                        onmouseup="this.style.transform ='scale(1)'">🚀 ตรวจวิชาทั่วไป</button>
+                                </div>
+                                <div class="result-display" style="display:none; margin-top: 15px;">
+                                    <div class="score-neon">--/100</div>
+                                    <div class="ai-text"></div>
+                                </div>
+                                <p>Navigate complex organizational change with precision-engineered AI.</p>
+                            </div>
+                        </div>
+
+                        <div class="services-tabs">
+                            <div class="service-tab active" data-target="strategy">
+                                <div class="tab-icon">📐</div>
+                                <h4>Mathematics</h4>
+                            </div>
+                            <div class="service-tab" data-target="digital">
+                                <div class="tab-icon">⚡</div>
+                                <h4>Physics</h4>
+                            </div>
+                            <div class="service-tab" data-target="performance">
+                                <div class="tab-icon">🧪</div>
+                                <h4>Chemistry</h4>
+                            </div>
+                            <div class="service-tab" data-target="market">
+                                <div class="tab-icon">📝</div>
+                                <h4>English</h4>
+                            </div>
+                            <div class="service-tab" data-target="innovation">
+                                <div class="tab-icon">🔬</div>
+                                <h4>Biology</h4>
+                            </div>
+                            <div class="service-tab" data-target="transformation">
+                                <div class="tab-icon">🌊</div>
+                                <h4>General</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about" class="about-section">
+                <div class="section about fade-in">
+                    <div class="about-content">
+                        <div class="highlight">Excellence Through Innovation</div>
+                        <h2>Let Stuwork be your 24/7 project proofreading assistant it will never get tired</h2>
+                        <p>We are pioneering consultants who have redefined strategic thinking...</p>
+                        <div class="about-features">
+                            <div class="feature-item">
+                                <div class="feature-icon">🎯</div>
+                                <div class="feature-text">To reduce the paperwork burden on teachers</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">📊</div>
+                                <div class="feature-text">To create a learning ecosystem that provides feedback</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">⚡</div>
+                                <div class="feature-text">Create an active learning cycle</div>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-icon">🚀</div>
+                                <div class="feature-text">Establish a data-driven, verifiable standard for measurement
+                                    of results</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-visual">
+                        <div class="about-image">
+                            <div class="visual-shapes">
+                                <div class="visual-shape"></div>
+                                <div class="visual-shape"></div>
+                                <div class="visual-shape"></div>
+                            </div>
+                            <img src="https://media.kare11.com/assets/KARE/images/68f10df4-cf09-43e4-a78a-11022bcef301/68f10df4-cf09-43e4-a78a-11022bcef301_1140x641.jpeg"
+                                alt="Strategic Excellence">
+                        </div>
+                        <div class="stats">
+                            <div class="stat"><span class="stat-number counter" data-count="79">0</span><span
+                                    class="stat-label">Reduce paper and ink</span></div>
+                            <div class="stat"><span class="stat-number counter" data-count="80">0</span><span
+                                    class="stat-label">Reduce working time</span></div>
+                            <div class="stat"><span class="stat-number counter" data-count="67">0</span><span
+                                    class="stat-label">Reduce paperwork</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="team" class="team">
+                <div class="section">
+                    <h2 class="section-title fade-in">Group member</h2>
+                    <div class="team-grid">
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-01.jpg" alt="Member 1" /></div>
+                                <div class="member-info">
+                                    <h3>Chatakarn Mekabut</h3>
+                                    <div class="member-role">NO.11</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-05.jpg" alt="Member 2" /></div>
+                                <div class="member-info">
+                                    <h3>Nakorn Phimsirikul</h3>
+                                    <div class="member-role">NO.12</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/20250813_145142_0.jpg" alt="Member 3" />
+                                </div>
+                                <div class="member-info">
+                                    <h3>Patcharakorn Bukkonprasert</h3>
+                                    <div class="member-role">NO.13</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-04.jpg" alt="Member 4" /></div>
+                                <div class="member-info">
+                                    <h3>Atichart Sahachartkosi</h3>
+                                    <div class="member-role">No.14</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-00.jpg" alt="Member 5" /></div>
+                                <div class="member-info">
+                                    <h3>Chansorn Kimyong</h3>
+                                    <div class="member-role">NO.19</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="team-member fade-in">
+                            <div class="member-card">
+                                <div class="member-avatar"><img src="images/team-member-06 (2).jpg" alt="Member 6" />
+                                </div>
+                                <div class="member-info">
+                                    <h3>Pornpipat Pongphun</h3>
+                                    <div class="member-role">NO.21</div>
+                                    <p>M.4/2</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="contact">
+                <div class="section">
+                    <h2 class="section-title fade-in">Initiate Your Transformation</h2>
+                    <div class="contact-content">
+                        <p>Ready to transcend conventional business boundaries?...</p>
+                        <form class="contact-form fade-in">
+                            <div class="form-group"><input type="text" placeholder="First Name" required><input
+                                    type="text" placeholder="Last Name" required></div>
+                            <div class="form-group"><input type="email" placeholder="Email Address" required><input
+                                    type="tel" placeholder="Phone Number"></div>
+                            <input type="text" placeholder="Organization Name"><textarea
+                                placeholder="Describe your strategic vision..." required></textarea>
+                            <button type="submit" class="submit-btn">Send advice</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-links"><a href="#privacy">Privacy Policy</a><a href="#terms">Terms of
+                            Service</a><a href="#careers">Careers</a></div>
+                    <div class="footer-copyright">© 2025 Stuwork. All rights reserved.</div>
+                    <div class="footer-design">Design: <a href="https://www.tooplate.com" target="_blank">Tooplate</a>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Admin UI Section -->
+    <div id="adminUI" style="display:none;">
+        <div class="main-website-content" style="display:block;">
+            <nav class="navbar" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%);">
+                <div class="nav-container">
+                    <a href="#" class="logo">
+                        <img src="images/PBL_LOGO-removebg-preview.png" alt="Stuwork Logo" class="logo-img">
+                    </a>
+                    <ul class="nav-links">
+                        <li><a href="#admin-dashboard">Dashboard</a></li>
+                        <li><a href="#admin-users">Users</a></li>
+                        <li><a href="#" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <section id="admin-dashboard" class="hero"
+                style="min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
+                <div class="hero-content" style="color: #1e293b;">
+                    <h1 style="color: #1e293b;">🛡️ Admin Dashboard</h1>
+                    <p style="color: #475569;">จัดการผู้ใช้และดูสถิติการใช้งานระบบ Stuwork</p>
+
+                    <div class="admin-stats"
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;">
+                        <div class="stat-card"
+                            style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <h3 style="color: #4ade80; font-size: 2.5em;">4000+</h3>
+                            <p style="color: #64748b;">ผู้ใช้ทั้งหมด</p>
+                        </div>
+                        <div class="stat-card"
+                            style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <h3 style="color: #3b82f6; font-size: 2.5em;" id="teacher-count">--</h3>
+                            <p style="color: #64748b;">ครู</p>
+                        </div>
+                        <div class="stat-card"
+                            style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                            <h3 style="color: #f59e0b; font-size: 2.5em;" id="student-count">--</h3>
+                            <p style="color: #64748b;">นักเรียน</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-actions" style="margin-top: 40px;">
+                        <button onclick="loadUsers()"
+                            style="background: #4ade80; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; cursor: pointer; margin: 10px;">📋
+                            โหลดรายชื่อผู้ใช้</button>
+                        <button onclick="logout()"
+                            style="background: #ef4444; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; cursor: pointer; margin: 10px;">🚪
+                            ออกจากระบบ</button>
+                    </div>
+
+                    <div id="users-list"
+                        style="margin-top: 40px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none;">
+                        <h3 style="color: #1e293b; margin-bottom: 20px;">📋 รายชื่อผู้ใช้</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f1f5f9;">
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">ชื่อ
+                                    </th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">อีเมล
+                                    </th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">บทบาท
+                                    </th>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">
+                                        การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer" style="background: #1e293b;">
+                <div class="footer-content">
+                    <div class="footer-copyright">© 2025 Stuwork. All rights reserved.</div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="tooplate-strategic-scripts.js"></script>
+
+    <script type="module">
+        import { GoogleGenerativeAI } from "@google/generative-ai";
+
+        // --- section 1:  Login and Role status---
+        document.addEventListener('DOMContentLoaded', () => {
+            const role = localStorage.getItem("role");
+
+            // If on the main page but no Role (not logged in), redirect to the Login page.
+            // Note: Check the pathname to prevent infinite loops in login.html itself.
+            if (!role && !window.location.pathname.includes("login.html")) {
+                // window.location.href = "login.html"; // Enable this when creating separate files.
+            }
+
+            // ซ่อน UI หลักไว้ก่อนจนกว่าจะ startApp
+            const teacherUI = document.getElementById("teacherUI");
+            const studentUI = document.getElementById("studentUI");
+            if (teacherUI) teacherUI.style.display = "none";
+            if (studentUI) studentUI.style.display = "none";
+        });
+
+        // --- section 2:  Login / Signup System (Original Logic of Your Code) ---
+        let currentRole = 'student'; // ค่าเริ่มต้นเป็น 'student'
+
+        window.selectRole = function (btn, role) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentRole = role;
+        }
+
+        const container = document.getElementById('container-login');
+        const registerBtn = document.getElementById('registerBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupForm = document.getElementById('signupForm');
+        const signinForm = document.getElementById('signinForm');
+
+        if (registerBtn) registerBtn.addEventListener('click', () => container.classList.add("active"));
+        if (loginBtn) loginBtn.addEventListener('click', () => container.classList.remove("active"));
+
+        // --- section 3:  Navigation System ---
+        window.enterWebsite = function (user) {
+            // บันทึก Role ลง LocalStorage เพื่อใช้ตาม Logic ส่วนแรกของคุณ
+            localStorage.setItem("role", user.role);
+
+            document.getElementById('login-screen').style.display = 'none';
+            const welcomePage = document.getElementById('welcome-page');
+            const welcomeTitle = document.getElementById('welcome-title');
+            const welcomeUserInfo = document.getElementById('welcome-user-info');
+            const welcomeDesc = document.getElementById('welcome-desc');
+
+            welcomePage.style.display = 'flex';
+            const roleText = user.role === 'teacher' ? 'ครู' : (user.role === 'admin' ? 'ผู้ดูแลระบบ' : 'นักเรียน');
+            welcomeUserInfo.innerText = `คุณ ${user.name} (${roleText})`;
+
+            if (user.role === 'teacher') {
+                welcomeTitle.innerText = "สวัสดีครับคุณครู !";
+                welcomeDesc.innerText = "ระบบพร้อมช่วยตรวจงานและสรุปคะแนนของนักเรียนทุกคนแล้ว";
+            } else if (user.role === 'admin') {
+                welcomeTitle.innerText = "ยินดีต้อนรับ Admin!";
+                welcomeDesc.innerText = "คุณสามารถจัดการผู้ใช้และดูสถิติการใช้งานระบบได้";
+            } else {
+                welcomeTitle.innerText = "สวัสดีนักเรียน!";
+                welcomeDesc.innerText = "ดูผลการตรวจงานของคุณได้ที่นี่";
+            }
+        }
+
+        // รวม Logic จาก startApp อันแรกเข้ากับอันที่สอง
+        window.startApp = function () {
+            const role = localStorage.getItem("role");
+            document.getElementById('welcome-page').style.display = 'none';
+
+            // แยกการแสดงผลตาม Role
+            if (role === "teacher") {
+                const tUI = document.getElementById("teacherUI");
+                if (tUI) tUI.style.display = "block";
+            } else if (role === "student") {
+                const sUI = document.getElementById("studentUI");
+                if (sUI) sUI.style.display = "block";
+            } else if (role === "admin") {
+                const aUI = document.getElementById("adminUI");
+                if (aUI) aUI.style.display = "block";
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // --- ส่วนที่ 4: Auth Logic (LocalStorage Database) ---
+        signupForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const db = JSON.parse(localStorage.getItem('stuwork_db') || '[]');
+
+            db.push({ name, email, password, role: currentRole });
+            localStorage.setItem('stuwork_db', JSON.stringify(db));
+            alert(`Account Created for ${currentRole}! Please Sign In.`);
+            container.classList.remove("active");
+        });
+
+        signinForm?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorText = document.getElementById('error-message');
+            const db = JSON.parse(localStorage.getItem('stuwork_db') || '[]');
+
+            // ค้นหา user และ role ที่เลือก
+            const user = db.find(u => u.email === email && u.password === password && u.role === currentRole);
+
+            if (user) {
+                if (errorText) errorText.style.display = 'none';
+                enterWebsite(user);
+            } else {
+                if (errorText) errorText.style.display = 'block';
+                document.getElementById('login-email').classList.add('input-error');
+                document.getElementById('login-password').classList.add('input-error');
+                container.classList.add('shake-animation');
+                setTimeout(() => container.classList.remove('shake-animation'), 500);
+            }
+        });
+
+        // --- ส่วนที่ 5: AI & Tabs Logic ---
+        const tabs = document.querySelectorAll('.service-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                const target = this.getAttribute('data-target');
+                const container = this.closest('.services-container'); // Find the specific container (Teacher or Student)
+
+                // Remove active class from tabs and contents WITHIN this container only
+                container.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
+                container.querySelectorAll('.service-details').forEach(c => c.classList.remove('active'));
+
+                // Activate clicked tab and corresponding content
+                this.classList.add('active');
+                container.querySelector(`.service-details[data-service="${target}"]`).classList.add('active');
+            });
+        });
+
+        // Initialize Gemini API
+        const API_KEY = "AIzaSyAHHhUePjYMEh70320VU-1dxNQj72WqrkE";
+        const genAI = new GoogleGenerativeAI(API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const analyzeButtons = document.querySelectorAll('.analyze-btn');
+        analyzeButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const currentPanel = e.target.closest('.service-details');
+                const fileInput = currentPanel.querySelector('.file-input');
+                const subject = e.target.getAttribute('data-subject');
+                const resultDisplay = currentPanel.querySelector('.result-display');
+                const scoreDiv = currentPanel.querySelector('.score-neon');
+                const textDiv = currentPanel.querySelector('.ai-text');
+
+                // Get full score from input or default to 100
+                let fullScoreInput = currentPanel.querySelector('.full-score-input');
+                const fullScore = fullScoreInput ? parseInt(fullScoreInput.value) || 100 : 100;
+
+                if (!fileInput.files[0]) {
+                    alert("Please upload an image first!");
+                    return;
+                }
+
+                btn.innerText = "⏳ AI Analyzing...";
+                btn.disabled = true;
+                resultDisplay.style.display = 'block';
+                textDiv.innerHTML = '<div class="ai-loading">AI กำลังอ่านลายมือและประมวลผล...</div>';
+
+                try {
+                    const file = fileInput.files[0];
+                    const base64Data = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(file);
+                    });
+
+                    // --- YOUR LOGIC INSTRUCTION ---
+                    let logicInstruction = "";
+                    if (["Math", "Physics"].includes(subject)) {
+                        logicInstruction = `เงื่อนไขสำคัญมาก: สำหรับวิชา ${subject} หากโจทย์ต้องการการคำนวณ แต่ในภาพ 'ไม่มีการแสดงวิธีทำ' หรือมีแค่ 'คำตอบสุดท้าย' 
+                        ให้คะแนนไม่เกิน 25/100 และระบุเหตุผลว่า 'โปรดแสดงวิธีทำเพื่อให้ได้คะแนนเต็ม'  
+                        แต่ถ้าโจทย์ไม่ได้ต้องการการคำนวณ ให้ตรวจตามปกติ และใช้ LaTeX สำหรับสมการ`;
+                    }
+
+                    const prompt = `คุณคืออาจารย์ผู้เชี่ยวชาญวิชา ${subject} ตรวจงานอย่างละเอียด ${logicInstruction}
+                    โปรดตรวจงานและตอบตามโครงสร้างนี้:
+                    1. คะแนนที่ได้: (X/${fullScore})
+                    2. จุดที่ทำได้ดี:
+                    3. ข้อผิดพลาดที่ควรแก้ไข:
+                    4. สรุปคำแนะนำ:
+                    5. เฉลยและวิธีทำ: (ใช้ LaTeX)`;
+
+                    const result = await model.generateContent([prompt, { inlineData: { data: base64Data, mimeType: file.type } }]);
+                    const response = result.response.text();
+
+                    const scoreMatch = response.match(/(\d+)\s*\/\s*\d+/);
+                    const score = scoreMatch ? scoreMatch[1] : (fullScore * 0.8).toFixed(0);
+
+                    // Create editable score display with Toggle Logic
+                    scoreDiv.innerHTML = `
+                        <span class="score-value display-mode" style="font-size: 1.2em;">${score}</span>
+                        <span style="font-size: 1.2em;">/${fullScore}</span>
+                        <button class="toggle-score-btn" style="margin-left: 10px; padding: 5px 15px; background: #fbbf24; color: #000; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.2s;">✏️ แก้ไข</button>
+                    `;
+
+                    // Add toggle listener
+                    const toggleBtn = scoreDiv.querySelector('.toggle-score-btn');
+                    const scoreSpan = scoreDiv.querySelector('.score-value');
+
+                    toggleBtn.addEventListener('click', () => {
+                        if (toggleBtn.innerText.includes('แก้ไข')) {
+                            // Switch to Edit Mode (Input)
+                            const currentScore = scoreSpan.innerText;
+                            scoreSpan.innerHTML = `<input type="number" class="score-temp-input" value="${currentScore}" style="width: 60px; font-size: 1em; text-align: center; border: 2px solid #4ade80; border-radius: 8px;">`;
+                            toggleBtn.innerHTML = '💾 บันทึก';
+                            toggleBtn.style.background = '#4ade80';
+                            toggleBtn.style.color = '#fff';
+                        } else {
+                            // Switch back to Display Mode (Text)
+                            const inputVal = scoreSpan.querySelector('.score-temp-input').value;
+                            if (Number(inputVal) > Number(fullScore)) {
+                                alert(`คะแนนต้องไม่เกิน ${fullScore}`);
+                                return;
+                            }
+                            scoreSpan.innerText = inputVal;
+                            toggleBtn.innerHTML = '✏️ แก้ไข';
+                            toggleBtn.style.background = '#fbbf24'; // Warning yellow
+                            toggleBtn.style.color = '#000';
+                            alert(`บันทึกคะแนน ${inputVal}/${fullScore} เรียบร้อยแล้ว!`);
+                        }
+                    });
+
+                    // Display AI feedback
+                    textDiv.innerHTML = response.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+                    if (window.MathJax && window.MathJax.typesetPromise) {
+                        await window.MathJax.typesetPromise([textDiv]);
+                    }
+
+                } catch (err) {
+                    textDiv.innerHTML = "❌ Error: " + err.message;
+                } finally {
+                    btn.innerText = `🚀 ตรวจวิชา${subject}`;
+                    btn.disabled = false;
+                }
+            });
+        });
+
+        // --- Admin Functions ---
+        window.logout = function () {
+            localStorage.removeItem('role');
+            location.reload();
+        }
+
+        window.loadUsers = function () {
+            const db = JSON.parse(localStorage.getItem('stuwork_db') || '[]');
+            const usersList = document.getElementById('users-list');
+            const tableBody = document.getElementById('users-table-body');
+
+            if (usersList) {
+                usersList.style.display = 'block';
+                tableBody.innerHTML = '';
+
+                // Update counts
+                const teachers = db.filter(u => u.role === 'teacher').length;
+                const students = db.filter(u => u.role === 'student').length;
+                const teacherCount = document.getElementById('teacher-count');
+                const studentCount = document.getElementById('student-count');
+                if (teacherCount) teacherCount.innerText = teachers;
+                if (studentCount) studentCount.innerText = students;
+
+                db.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${user.name}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${user.email}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${user.role}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                            <button onclick="deleteUser(${index})" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">🗑️ ลบ</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        window.deleteUser = function (index) {
+            if (confirm('คุณต้องการลบผู้ใช้นี้หรือไม่?')) {
+                const db = JSON.parse(localStorage.getItem('stuwork_db') || '[]');
+                db.splice(index, 1);
+                localStorage.setItem('stuwork_db', JSON.stringify(db));
+                loadUsers();
+            }
+        }
+    </script>
+</body>
+
+</html>
